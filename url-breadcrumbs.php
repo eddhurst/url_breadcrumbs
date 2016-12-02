@@ -20,23 +20,47 @@ function get_breadcrumbs() {
 
 	global $wp;
 
+	// Split page URL into component parts by / character.
 	$breadcrumb_items = explode( '/', $wp->request );
 
 	$breadcrumb_url = esc_url( home_url( '/' ) );
 
+	// Loop through each breadcrumb item, to identify what content it links to.
 	foreach ( $breadcrumb_items as $key => $breadcrumb ) :
 
 		$breadcrumb_url = esc_url( $breadcrumb_url . $breadcrumb . '/' );
 
 		$breadcrumb_id = url_to_postid( $breadcrumb_url );
 
-		$breadcrumb_title = get_the_title( $breadcrumb_id );
+		// If breadcrumb_id has returned as non 0, it is a post / page / custom post.
+		if ( 0 !== $breadcrumb_id ) :
+
+			$breadcrumb_title = get_the_title( $breadcrumb_id );
+			$breadcrumb_type = get_post_type( $breadcrumb_id );
+
+		else :		// If breadcrumb_id is 0, page could be a taxonomy.
+
+			$breadcrumb_id = get_cat_ID( $breadcrumb );
+			$breadcrumb_type = 'taxonomy';
+			$breadcrumb_title = get_cat_name( $breadcrumb_id );
+
+			// If breadcumb_id is still null, breadcrumb is likely a pseudo-page.
+			if ( 0 === $breadcrumb_id ) :
+
+				$breadcrumb_id = '';
+				$breadcrumb_title = $breadcrumb;
+				$breadcrumb_type = '';
+
+			endif;
+
+		endif;
 
 		$breadcrumb_items[ $key ] = array(
 			'id'	=> $breadcrumb_id,
 			'title'	=> $breadcrumb_title,
 			'slug'	=> $breadcrumb,
 			'url'	=> $breadcrumb_url,
+			'type'	=> $breadcrumb_type,
 		);
 
 	endforeach;
