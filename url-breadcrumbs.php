@@ -11,7 +11,6 @@
  * @version 1.1
  */
 
-
 if ( ! function_exists( 'get_breadcrumbs' ) ) {
 
 	/**
@@ -71,12 +70,11 @@ if ( ! function_exists( 'get_breadcrumbs' ) ) {
 		return $breadcrumb_items;
 
 	}
-
 }
 
 
 if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
-	
+
 	/**
 	 * Generates breadcrumbs into user-friendly output.
 	 *
@@ -103,5 +101,4 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 		return $breadcrumbs_output;
 
 	}
-
 }
