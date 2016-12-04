@@ -105,7 +105,7 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 		foreach ( $breadcrumb_items as $key => $breadcrumb ) :
 
 			// If post is a page / post / attachment identify the current post status.
-			if( 'taxonomy' !== $breadcrumb['type'] && $breadcrumb['type'] ) :
+			if ( 'taxonomy' !== $breadcrumb['type'] && $breadcrumb['type'] ) :
 
 				$breadcrumb_post_status = get_post_status( $breadcrumb['id'] );
 
@@ -116,11 +116,11 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 			endif;
 
 			// If post status is set as publish (i.e. public and posted) then allow breadcrumb to link.
-			if( 'publish' === $breadcrumb_post_status ) :
+			if ( 'publish' === $breadcrumb_post_status ) :
 
 				$breadcrumbs_output .= $separator . '<a href="' . $breadcrumb['url'] . '" title="' . $breadcrumb['title'] . '">' . $breadcrumb['title'] . '</a>';
 
-			// Else, just output page title.
+				// Else, just output page title.
 			else :
 
 				$breadcrumbs_output .= $separator . $breadcrumb['title'];
