@@ -88,9 +88,19 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 		// Add white space around separator.
 		$separator = ' ' . $separator . ' ';
 
-		$breadcrumb_items = get_breadcrumbs();
+		$base_title = esc_attr( $base_title );
+		$separator = esc_attr( $separator );
 
-		$breadcrumbs_output = '<a href="' . home_url() . '" title="' . $base_title . '">' . $base_title . '</a>';
+		// If breadcrumb items does not return as array, stop.
+		if ( ! is_array( $breadcrumb_items = get_breadcrumbs() ) ) {
+			return false;
+		}
+
+		// Generate output for base url.
+		$breadcrumb_base_link = '<a href="' . esc_url( home_url() ) . '" title="' . $base_title . '">' . $base_title . '</a>';
+
+		// Allow users the option to filter / remove / replace the home link.
+		$breadcrumbs_output = apply_filters( 'breadcrumbs_home_link', $breadcrumb_base_link );
 
 		foreach ( $breadcrumb_items as $key => $breadcrumb ) :
 
@@ -98,7 +108,9 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 
 		endforeach;
 
-		return $breadcrumbs_output;
+		return apply_filters( 'breadcrumbs_output', $breadcrumbs_output );
+
+		return ;
 
 	}
 }
