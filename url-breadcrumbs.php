@@ -4,11 +4,11 @@
  * Plugin URI: http://wordpress.org/plugins/url-breadcrumbs
  * Description: A set of developer functions to easily generate breadcrumbs from your URL.
  * Author: Edd Hurst
- * Version: 1.1
+ * Version: 1.2
  * Author URI: http://eddhurst.co.uk/
  *
  * @package URL_Breadcrumbs
- * @version 1.1
+ * @version 1.2
  */
 
 if ( ! function_exists( 'get_breadcrumbs' ) ) {
