@@ -1,15 +1,13 @@
 # url_breadcrumbs
 Wordpress Plugin for 'URL Breadcrumbs' a set of developer functions to easily generate breadcrumbs from your URL.
 
-#Upcoming
-
 #Known issues
 
 1.3 brings support to link to pseudo pages, however custom post type root pages are ignored in this also, as they are not included in the wp->matched_queries call.
 
-get_cat_ID uses category Names to identify, rather than slugs, so isn't a great solution. Will need to rectify this.
-
 #Changelog
+
+1.4 - Amended method of identifying category to allow for slugs rather than names, allowing child categories to sit in breadcrumbs.
 
 1.3 - Support added to identify pseudo pages (i.e. date archives) to allow for breadcrumb links to incorporate hard to pinpoint pages, as well as to strip out unwanted breadcrumbs to non-pages such as category and tag base.
 

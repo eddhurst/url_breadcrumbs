@@ -4,11 +4,11 @@
  * Plugin URI: http://wordpress.org/plugins/url-breadcrumbs
  * Description: A set of developer functions to easily generate breadcrumbs from your URL.
  * Author: Edd Hurst
- * Version: 1.3
+ * Version: 1.4
  * Author URI: http://eddhurst.co.uk/
  *
  * @package URL_Breadcrumbs
- * @version 1.3
+ * @version 1.4
  */
 
 if ( ! function_exists( 'get_breadcrumbs' ) ) {
@@ -42,12 +42,14 @@ if ( ! function_exists( 'get_breadcrumbs' ) ) {
 
 			else :		// If breadcrumb_id is 0, page could be a taxonomy.
 
-				$breadcrumb_id = get_cat_ID( $breadcrumb );
+				$category_obj = get_category_by_slug( $breadcrumb );
+
+				$breadcrumb_id = $category_obj->term_id;
 				$breadcrumb_type = 'taxonomy';
-				$breadcrumb_title = get_cat_name( $breadcrumb_id );
+				$breadcrumb_title = $category_obj->name;
 
 				// If breadcumb_id is still null, breadcrumb is likely a pseudo-page.
-				if ( 0 === $breadcrumb_id ) :
+				if ( empty( $breadcrumb_id ) ) :
 
 					$breadcrumb_id = '';
 					$breadcrumb_title = $breadcrumb;
