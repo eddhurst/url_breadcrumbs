@@ -40,7 +40,7 @@ if ( ! function_exists( 'get_breadcrumbs' ) ) {
 				$breadcrumb_title = get_the_title( $breadcrumb_id );
 				$breadcrumb_type = get_post_type( $breadcrumb_id );
 
-			else :		// If breadcrumb_id is 0, page could be a taxonomy.
+			else :	// If breadcrumb_id is 0, page could be a taxonomy.
 
 				$category_obj = get_category_by_slug( $breadcrumb );
 
@@ -76,7 +76,6 @@ if ( ! function_exists( 'get_breadcrumbs' ) ) {
 
 if ( ! function_exists( 'generate_breadcrumb_matched_query' ) ) {
 
-
 	/**
 	 * Strips apart the wp->matched_query to identify which parts of URL are valid pages.
 	 *
@@ -108,7 +107,6 @@ if ( ! function_exists( 'generate_breadcrumb_matched_query' ) ) {
 
 						// Include value in top-level array.
 						$breadcrumb_matches['total_items'][] .= $exploded_value;
-						;
 
 						// Include value in array with specific query key.
 						$breadcrumb_matches[ $exploded_query_item[0] ][] = $exploded_value;
@@ -198,7 +196,7 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 
 				$breadcrumbs_output .= $separator . '<a href="' . $breadcrumb['url'] . '" title="' . $breadcrumb['title'] . '">' . $breadcrumb['title'] . '</a>';
 
-				// Else, just output page title.
+			// Else, just output page title.
 			else :
 
 				$breadcrumbs_output .= $separator . $breadcrumb['title'];
