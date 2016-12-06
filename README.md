@@ -3,11 +3,15 @@ Wordpress Plugin for 'URL Breadcrumbs' a set of developer functions to easily ge
 
 #Upcoming
 
-Need to find a way to identify if a page is a valid archive page, or if it's a pseudo page (i.e. 'category' ) that will result in a 404.
+#Known issues
 
-In 1.2.1 we attempt to identify post status and strip out links where post is not a published post (i.e. private or draft), but subsequently has knocked out links for taxonomy pages, need to fix this before pushing to major release.
+1.3 brings support to link to pseudo pages, however custom post type root pages are ignored in this also, as they are not included in the wp->matched_queries call.
+
+get_cat_ID uses category Names to identify, rather than slugs, so isn't a great solution. Will need to rectify this.
 
 #Changelog
+
+1.3 - Support added to identify pseudo pages (i.e. date archives) to allow for breadcrumb links to incorporate hard to pinpoint pages, as well as to strip out unwanted breadcrumbs to non-pages such as category and tag base.
 
 1.2.1 -  Support for post status identification.
 

@@ -4,11 +4,11 @@
  * Plugin URI: http://wordpress.org/plugins/url-breadcrumbs
  * Description: A set of developer functions to easily generate breadcrumbs from your URL.
  * Author: Edd Hurst
- * Version: 1.2.1
+ * Version: 1.3
  * Author URI: http://eddhurst.co.uk/
  *
  * @package URL_Breadcrumbs
- * @version 1.2.1
+ * @version 1.3
  */
 
 if ( ! function_exists( 'get_breadcrumbs' ) ) {
@@ -72,29 +72,97 @@ if ( ! function_exists( 'get_breadcrumbs' ) ) {
 	}
 }
 
+if ( ! function_exists( 'generate_breadcrumb_matched_query' ) ) {
+
+
+	/**
+	 * Strips apart the wp->matched_query to identify which parts of URL are valid pages.
+	 *
+	 * @return array	$breadcrumb_matches		( ['total_items'] => array(), ['{query_type}'] => {post-slug}, ... )
+	 */
+	function generate_breadcrumb_matched_query() {
+
+		global $wp;
+
+		// Split wp->matched_query into query parameters
+		$breadcrumb_matched_query_items = explode( '&', $wp->matched_query );
+
+		// Set a top-level array to easily identify items in, as well as individual items in case we need to refine.
+		$breadcrumb_matches['total_items'] = array();
+
+		foreach ( $breadcrumb_matched_query_items as $query_item ) :
+
+			// Split individual query parameters into their keys and values
+			$exploded_query_item = explode( '=', $query_item );
+
+			if ( ! empty( $exploded_query_item[1] ) ) :
+
+				// Check if value is singular or mulitple, If multiple, save as array.
+				if ( preg_match( '/%2F/', $exploded_query_item[1] ) ) :
+
+					$exploded_values = explode( '%2F', $exploded_query_item[1] );
+
+					foreach ( $exploded_values as $exploded_value ) :
+
+						// Include value in top-level array.
+						$breadcrumb_matches['total_items'][] .= $exploded_value;
+						;
+
+						// Include value in array with specific query key.
+						$breadcrumb_matches[ $exploded_query_item[0] ][] = $exploded_value;
+
+					endforeach;
+
+				else :
+
+					// Include value in top-level array.
+					$breadcrumb_matches['total_items'][] .= $exploded_query_item[1];
+
+					// Include value in array with specific query key.
+					$breadcrumb_matches[ $exploded_query_item[0] ] = $exploded_query_item[1];
+
+				endif;
+
+			endif;
+
+		endforeach;
+
+		return $breadcrumb_matches;
+
+	}
+}
 
 if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 
 	/**
 	 * Generates breadcrumbs into user-friendly output.
 	 *
-	 * @param string $base_title     The title of the root element.
-	 * @param string $separator      The separator between elements.
+	 * @param string	$base_title     The title of the root element.
+	 * @param string	$separator      The separator between elements.
+	 * @param bool		$links			Whether or not to have links in elements.
 	 *
-	 * @return string	$breadcrumb_output		Output for breadcrumb trail, complete with links and separators.
+	 * @return string	$breadcrumb_output		Output for breadcrumb trail, complete with links and separators as necessary.
 	 */
-	function generate_breadcrumb_output( $base_title = 'Home', $separator = '&raquo;' ) {
-
-		// Add white space around separator.
-		$separator = ' ' . $separator . ' ';
-
-		$base_title = esc_attr( $base_title );
-		$separator = esc_attr( $separator );
+	function generate_breadcrumb_output( $base_title = 'Home', $separator = '&raquo;', $links = true ) {
 
 		// If breadcrumb items does not return as array, stop.
 		if ( ! is_array( $breadcrumb_items = get_breadcrumbs() ) ) {
 			return false;
 		}
+
+		if ( ! is_array( $breadcrumbs_queried = generate_breadcrumb_matched_query() ) ) {
+			return false;
+		}
+
+		global $wp;
+
+		// Add white space around separator.
+		$separator = ' ' . $separator . ' ';
+
+		// Escape variables, just in case.
+		$base_title = esc_attr( $base_title );
+		$separator = esc_attr( $separator );
+		$links = esc_attr( $links );
 
 		// Generate output for base url.
 		$breadcrumb_base_link = '<a href="' . esc_url( home_url() ) . '" title="' . $base_title . '">' . $base_title . '</a>';
@@ -103,6 +171,14 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 		$breadcrumbs_output = apply_filters( 'breadcrumbs_home_link', $breadcrumb_base_link );
 
 		foreach ( $breadcrumb_items as $key => $breadcrumb ) :
+
+			// Check to see if breadcrumb slug is in wp->matched_queries.
+			$breadcrumb_in_query = in_array( $breadcrumb['slug'], $breadcrumbs_queried['total_items'], true );
+
+			// If breadcrumb not in matched queries, skip.
+			if ( ! $breadcrumb_in_query ) {
+				continue;
+			}
 
 			// If post is a page / post / attachment identify the current post status.
 			if ( 'taxonomy' !== $breadcrumb['type'] && $breadcrumb['type'] ) :
@@ -115,8 +191,8 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 
 			endif;
 
-			// If post status is set as publish (i.e. public and posted) then allow breadcrumb to link.
-			if ( 'publish' === $breadcrumb_post_status ) :
+			// If links enabled and breadcrumb type is empty or set to taxonomy, or post status is set to publish, output link.
+			if ( $links && ( ( empty( $breadcrumb['type'] ) || 'taxonomy' === $breadcrumb['type'] ) || 'publish' === $breadcrumb_post_status ) ) :
 
 				$breadcrumbs_output .= $separator . '<a href="' . $breadcrumb['url'] . '" title="' . $breadcrumb['title'] . '">' . $breadcrumb['title'] . '</a>';
 
@@ -130,8 +206,6 @@ if ( ! function_exists( 'generate_breadcrumb_output' ) ) {
 		endforeach;
 
 		return apply_filters( 'breadcrumbs_output', $breadcrumbs_output );
-
-		return ;
 
 	}
 }
